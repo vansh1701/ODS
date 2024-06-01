@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
 const donor_signup = new mongoose.Schema({
     dname : {
@@ -14,7 +15,7 @@ const donor_signup = new mongoose.Schema({
         require:true
     },
     referID : {
-        type:Number,
+        type:String,
         require:true
     },
     password : {
@@ -25,7 +26,27 @@ const donor_signup = new mongoose.Schema({
         type:String,
         require:true
     },
+    tokens:[{
+        token:{
+            type:String
+        }
+    }]
 }) 
+
+
+donor_signup.methods.generateAuthToken = async function() {
+    try {
+        console.log(this._id.toString());
+        const token = jwt.sign({_id: this._id.toString()}, process.env.SECRET_KEY);
+        this.tokens = this.tokens.concat({token: token});
+        await this.save(); 
+        return token;
+    } catch (error) {
+        console.error("Error generating auth token:", error);
+        throw new Error("Error generating auth token");
+    }
+}
+
 
 console.log('1');
 const Signupd = new mongoose.model("Student", donor_signup);
