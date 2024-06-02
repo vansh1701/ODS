@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>ODS</title>
+</head>
+<body>
+    <nav class="navbar background h-nav">
+        <div class="list">
+            <ul class="nav-bar v-class">
+                <li><a href="home">Home</a></li>
+                <li><a href="about">About Us</a></li>
+                <li><a href="contact">Contact Us</a></li>
+                <li><a href="logout">Logout</a></li>
+            </ul>
+        </div>
+        <div class="burger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </nav>
+    <section class="background firstsection">
+        <div class="box-main">
+            <div class="fhalf">
+                <p class="text-big">Schedule Jobs :</p>
+                <table class="tb">
+                    <tr>
+                        <th>Name</th>
+                        <th>Employee ID</th>
+                        <th>Duty</th>
+                        <th>Notes</th>
+                    </tr>
+                    <% checkd.forEach(function(element) { %>
+                        <tr style="text-align: center">
+                            <td><%= element.dname %></td>
+                            <td><%= element.dempid %></td>
+                            <form action="/edit?id=<%= element._id %>" method="POST">
+                                <td><label for="duty">Duty Area : </label>
+                                    <select name="duty" id="duty">
+                                        <option value="Gallery 1">Gallery 1</option>
+                                        <option value="Gallery 2">Gallery 2</option>
+                                        <option value="Gallery 3">Gallery 3</option>
+                                        <option value="Gallery 4">Gallery 4</option>
+                                        <option value="Gallery 5">Gallery 5</option>
+                                        <option value="Gallery 6">Gallery 6</option>
+                                        <option value="Gallery 7">Gallery 7</option>
+                                        <option value="Gallery 8">Gallery 8</option>
+                                        <option value="Gallery 9">Gallery 9</option>
+                                    </select><br></td>
+                                <td><textarea id="notes" class="form-input" name="notes" style="width: 75%; height: 25px; font-size: 12px;" placeholder="Enter Additional Notes : "></textarea>
+                                </td>
+                                <td>
+                                    <button class="btn" type="submit">SCHEDULE</button>
+                                </td>
+                            </form>
+                        </tr>
+                    <% }); %>
+                </table>
+            </div>
+        </div>
+    </section>
+    <footer class="background">
+        <p class="text-footer">
+            Copyright &copy; 2027 - All Rights Reserved
+        </p>
+    </footer>
+    <script src="resp/resp.js"></script>
+</body>
+</html>

@@ -28,10 +28,10 @@ app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 
 app.use(session({
-    secret: 'mynameisvanshmittal',  // Replace with your own secret key
+    secret: 'mynameisvanshmittal',  
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 6000000 }  // Session will expire in 60 seconds for this example
+    cookie: { maxAge: 6000000 }
 }));
 
 app.get("/",(req,res)=>{
@@ -48,14 +48,40 @@ app.get("/about", auth ,(req,res)=>{
     })
 });
 
+app.get("/about_2", auth ,(req,res)=>{
+    res.render("about_2",{
+        usermData:res.userm
+    })
+});
+
+app.get("/profilea", auth ,(req,res)=>{
+    res.render("profilea",{
+        userData:res.user
+    })
+});
+
+app.get("/profilem", auth ,(req,res)=>{
+    res.render("profilem",{
+        usermData:res.userm
+    })
+});
+
+app.get("/viewduty", auth ,(req,res)=>{
+    res.render("viewduty",{
+        usermData:res.userm
+    })
+});
+
 app.get("/contact", auth ,(req,res)=>{
     res.render("contact",{
         userData:res.user
     })
 });
 
-app.get("/login",(_,resp)=>{
-    resp.render('login');
+app.get("/contact_2", auth ,(req,res)=>{
+    res.render("contact_2",{
+        usermData:res.userm
+    })
 });
 
 app.get("/loginm",(_,resp)=>{
@@ -70,13 +96,121 @@ app.get("/signupm",(_,resp)=>{
     resp.render("signupm");
 });
 
+app.use((req, res, next) => {
+    if (req.session.user) {
+        res.user = req.session.user; // Assuming req.session.user contains the user data
+    }
+    next();
+});
+
+app.use((req, res, next) => {
+    if (req.session.userm) {
+        res.userm = req.session.userm; // Assuming req.session.user contains the user data
+    }
+    next();
+});
+
 app.get("/home", (req, res) => {
     if (req.session.user) {
-        res.render("home");
+        res.render("home", {
+            userData: req.session.user // Ensure userData is passed correctly
+        });
     } else {
         res.redirect("/login");
     }
 });
+
+app.get("/home_2", (req, res) => {
+    if (req.session.userm) {
+        res.render("home_2", {
+            usermData: req.session.userm // Ensure userData is passed correctly
+        });
+    } else {
+        console.log("unable");
+    }
+});
+
+app.post("/edit", auth, async (req, res) => {
+    try {
+        const id = req.query.id; // Fetch the ID from the query parameter
+        if (!id) {
+            return res.status(400).send("ID parameter is missing");
+        }
+
+        console.log("ID from query:", id);
+        console.log("Duty from body:", req.body.duty);
+        console.log("Notes from body:", req.body.notes);
+
+        let check = await SignUpMember.findOneAndUpdate(
+            { _id: id },
+            {
+                $set: {
+                    duty: req.body.duty,
+                    notes: req.body.notes
+                }
+            },
+            { upsert: true, new: true } 
+        );
+
+        console.log("Update result:", check);
+        res.redirect('/schedule'); 
+    } catch (error) {
+        res.status(500).send(error);
+        console.log(error);
+    }
+});
+
+app.get("/schedule", auth, async (req, res) => {
+    try {
+        const referID = res.user ? res.user.referID : res.userm.referID;
+        let checkd = await signupm.find({ referID: referID });
+        if (!checkd) {
+            checkd = [];
+        }
+        res.status(201).render("schedule", {
+            checkd: checkd,
+            userData: res.user || res.userm
+        });
+    } catch (error) {
+        console.error("Error retrieving team members:", error);
+        res.status(500).send("Error retrieving team members");
+    }
+});
+
+app.get("/viewteam", auth, async (req, res) => {
+    try {
+        const referID = res.user ? res.user.referID : res.userm.referID;
+        let checkd = await signupm.find({ referID: referID });
+        if (!checkd) {
+            checkd = [];
+        }
+        res.status(201).render("viewteam", {
+            checkd: checkd,
+            userData: res.user || res.userm
+        });
+    } catch (error) {
+        console.error("Error retrieving team members:", error);
+        res.status(500).send("Error retrieving team members");
+    }
+});
+
+app.get("/viewduty2", auth, async (req, res) => {
+    try {
+        const referID = res.user ? res.user.referID : res.userm.referID;
+        let checkd = await signupm.find({ referID: referID });
+        if (!checkd) {
+            checkd = [];
+        }
+        res.status(201).render("viewduty2", {
+            checkd: checkd,
+            userData: res.user || res.userm
+        });
+    } catch (error) {
+        console.error("Error retrieving team members:", error);
+        res.status(500).send("Error retrieving team members");
+    }
+});
+
 
 const signupd = require("./models/signupd");
 app.post("/signupd", async(req,res) =>{
@@ -96,7 +230,7 @@ app.post("/signupd", async(req,res) =>{
             })
             console.log(registerDonor);
  const registerd = await registerDonor.save();
-    res.status(201).render("home",{ userData: user 
+    res.status(201).render("home_1",{ userData: user 
     });
 }else{
     res.send("passwords donot matching");
@@ -153,7 +287,9 @@ app.post("/signupm", async(req,res) =>{
                 dphone : req.body.dphone,
                 referID : req.body.referID,
                 password : req.body.password, 
-                confirm_password : req.body.confirm_password
+                confirm_password : req.body.confirm_password,
+                duty : "",
+                notes : ""
             })
             console.log(registermember);
  const registerd = await registermember.save();
@@ -169,24 +305,24 @@ app.post("/loginm", async (req, res) => {
     try {
         const { dempid, password } = req.body;
 
-        console.log("Received dempid:", dempid);  // Debugging line
+        console.log("Received m dempid:", dempid);  // Debugging line
         console.log("Received password:", password);  // Debugging line
 
-        const user = await SignUpMember.findOne({ dempid });
-        console.log(user);
-        if (!user) {
+        const userm = await SignUpMember.findOne({ dempid });
+        console.log(userm);
+        if (!userm) {
             console.log("User not found with dempid:", dempid);  // Debugging line
             return res.status(400).send("User not found");
         }
 
-        const token = await user.generateAuthToken(); 
+        const token = await userm.generateAuthToken(); 
         res.cookie("jwt", token);
         
 
-        if (password == user.password) {   
-            req.session.user = user;
+        if (password == userm.password) {   
+            req.session.userm = userm;
             console.log('Login successful');
-            res.status(201).render("home_2",{ userData: user 
+            res.status(201).render("home_2",{ usermData: userm 
             });
         } else {
             console.log("Invalid password for dempid:", dempid);  // Debugging line
@@ -197,35 +333,6 @@ app.post("/loginm", async (req, res) => {
         res.status(400).send(error.message);
     }
 });
-
-
-// app.post("/login", async(req, res) =>{
-//     try{
-//         const empID = req.body.dempid;
-//         const password = req.body.password;
-//         let uemail = await SignUpUser.findOne({dempid:empID});
-//         console.log(uemail);
-        
-//         if(password == uemail.password){
-//             console.log('hello');
-//         res.render("home");
-//         }else{
-//             res.send("invalid password details");
-//         }
-//     }catch (error){
-//         res.status(400).send(error)
-//     }
-// })
-
-// app.get("/logout", (req, res) => {
-//     req.session.destroy((err) => {
-//         if (err) {
-//             return res.status(500).send("Error logging out");
-//         }
-//         res.redirect("/login");
-//     });
-// });
-
 
 app.get("/logout", auth ,async (req,res)=>{
     try {

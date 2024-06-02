@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>ODS</title>
+</head>
+<body>
+    <nav class="navbar background h-nav">
+        <div class="list">
+            <ul class="nav-bar v-class">
+                <li><a href="home">Home</a></li>
+                <li><a href="about">About Us</a></li>
+                <li><a href="contact">Contact Us</a></li>
+                <li><a href="logout">Logout</a></li>
+            </ul>
+        </div>
+        <div class="burger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </nav>
+    <section class="background firstsection">
+        <div class="box-main">
+            <div class="fhalf">
+                <p class="text-big">Team Members:</p>
+                <table class="tb">
+                    <tr>
+                        <th>Name</th>
+                        <th>Employee ID</th>
+                    </tr>
+                    <% checkd.forEach(function(element) { %>
+                        <tr style="text-align: center">
+                            <td><%= element.dname %></td>
+                            <td><%= element.dempid %></td>
+                            
+                        </tr>
+                    <% }); %>
+                </table>
+            </div>
+        </div>
+    </section>
+    <footer class="background">
+        <p class="text-footer">
+            Copyright &copy; 2027 - All Rights Reserved
+        </p>
+    </footer>
+    <script src="resp/resp.js"></script>
+</body>
+</html>

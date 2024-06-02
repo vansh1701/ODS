@@ -26,6 +26,12 @@ const member_signup = new mongoose.Schema({
         type:String,
         require:true
     },
+    duty : {
+        type:String
+    },
+    notes : {
+        type:String
+    },
     tokens:[{
         token:{
             type:String 
